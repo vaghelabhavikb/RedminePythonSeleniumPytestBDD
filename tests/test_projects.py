@@ -13,7 +13,6 @@ scenarios("../features/projects.feature")
 def login_page(cd):
     return LoginPage(cd)
 
-
 @pytest.fixture
 def landing_page(cd):
     return LandingPage(cd)
