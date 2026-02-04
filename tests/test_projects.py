@@ -8,7 +8,7 @@ from pom.projects_query_page import ProjectsQueryPage
 
 scenarios("../features/projects.feature")
 
-
+#comment added
 @pytest.fixture
 def login_page(cd):
     return LoginPage(cd)
