@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Pytest-BDD",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-v",
+        "-m",
+        "IP"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONBREAKPOINT": "debugpy.breakpoint"
+      },
+      "justMyCode": false
+    }
+  ]
+}
