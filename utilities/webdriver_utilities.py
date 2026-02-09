@@ -1,4 +1,4 @@
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import ActionChains
@@ -40,6 +40,10 @@ class WebDriverUtilities:
                 print(f"Retrying click on {by} due to {type(e).__name__}...")
                 time.sleep(1)  # Short breath for the DOM to settle
 
+    def select_by_visible_text(self, by, value):
+        element = self.wait.until(expected_conditions.element_to_be_clickable(by))
+        Select(element).select_by_visible_text(value)
+
     def find_element(self, by):
         return self.wait.until(expected_conditions.presence_of_element_located(by))
 
@@ -52,6 +56,9 @@ class WebDriverUtilities:
 
     def find_elements(self, by):
         return self.wait.until(expected_conditions.presence_of_all_elements_located(by))
+
+    def clear(self, by):
+        self.wait.until(expected_conditions.element_to_be_clickable(by)).clear()
 
     def send_text(self, by, text):
         self.wait.until(expected_conditions.element_to_be_clickable(by)).send_keys(text)
