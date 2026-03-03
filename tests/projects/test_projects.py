@@ -1,0 +1,114 @@
+from ast import Assert
+from math import exp
+import pytest
+import pytest_check
+from tests.projects.common_steps import *
+from tests.common_steps import *
+from pytest_bdd import scenarios, given, step, when, then, parsers
+from pom.create_issue_form import CreateIssueForm
+from pom.issues_tab import IssuesTab
+from pom.login_page import LoginPage
+from pom.landing_page import LandingPage
+from pom.create_project_form import CreateProjectForm
+from pom.project_issue_info_page import ProjectIssueInfoPage
+from pom.project_page import ProjectPage
+from pom.projects_query_page import ProjectsQueryPage
+
+from tests.types import LoginCredentials
+
+scenarios("../../features/projects.feature")
+
+
+@pytest.fixture
+def project_page(cd):
+    return ProjectPage(cd)
+
+
+@pytest.fixture
+def issues_tab(cd):
+    return IssuesTab(cd)
+
+
+@pytest.fixture
+def create_issue_form(cd):
+    return CreateIssueForm(cd)
+
+
+@pytest.fixture
+def create_project_form_page(cd):
+    return CreateProjectForm(cd)
+
+
+@pytest.fixture
+def project_issue_info_page(cd):
+    return ProjectIssueInfoPage(cd)
+
+
+@when("clicks on New Project link to create the project")
+def launch_new_project_form(projects_query_page: ProjectsQueryPage):
+    projects_query_page.open_project_creation_form()
+
+
+@when(parsers.parse("User enters {project_name} and creates the project"))
+def user_enters_project_name(create_project_form_page: CreateProjectForm, project_name):
+    create_project_form_page.create_project(project_name)
+
+
+@then("Project should be created successfully")
+def check_project_created_succesfully(create_project_form_page: CreateProjectForm):
+    pytest_check.is_true(create_project_form_page.check_project_creation_success())
+
+
+@when(parsers.parse("User creates the {project_name} project with optional fields"))
+def create_project_with_optional_fields(
+    create_project_form_page: CreateProjectForm, project_name, project_creation_data
+):
+    create_project_form_page.create_project_with_optional_fields(
+        project_name, project_creation_data
+    )
+
+
+@given(parsers.parse("User open {project_name} project"))  # user open "DocID" project
+def open_project(projects_query_page: ProjectsQueryPage, project_name):
+    projects_query_page.open_project(project_name)
+
+
+@given("navigates to issues tab")
+def navigate_to_issues_tab(project_page: ProjectPage):
+    project_page.nav_to_issues_tab()
+
+
+@when("user opens create issue form")
+def user_opens_create_issue_form(issues_tab: IssuesTab):
+    issues_tab.open_issue_creation_form()
+
+
+@when(parsers.parse("enters {issue} fields values and creates issue"))
+def user_enters_issue_fields_values_and_creates_issue(
+    create_issue_form: CreateIssueForm, issue, issue_creation_data
+):
+    create_issue_form.create_issue(issue, issue_creation_data)
+
+
+@then(parsers.parse("the {issue} info should display correct fields values"))
+def the_task_info_should_display_correct_fields_values(
+    project_issue_info_page: ProjectIssueInfoPage, issue: str, issue_creation_data
+):
+    act = project_issue_info_page.get_issue_info()
+    exp = issue_creation_data[issue]
+
+    for key in exp:
+        assert act[key] == exp[key]
+
+
+# **2. Multi-Level conftest.py (For Organized Projects)**
+
+# Create `conftest.py` at different directory levels:
+# ```
+# project/
+# ├── conftest.py  # Global fixtures
+# ├── features/
+# │   ├── conftest.py  # Feature-specific fixtures
+# │   ├── login/
+# │   │   ├── conftest.py
+# │   │   └── login_steps.py
