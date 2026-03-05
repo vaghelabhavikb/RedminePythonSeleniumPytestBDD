@@ -1,3 +1,4 @@
+from datetime import datetime
 from math import exp
 import pytest
 import pytest_check
@@ -11,7 +12,7 @@ from pom.project_issue_info_page import ProjectIssueInfoPage
 from pom.project_page import ProjectPage
 from pom.projects_query_page import ProjectsQueryPage
 
-from tests.projects.types import ProjectsCreationData
+from tests.projects.types import IssuesCreationData, ProjectsCreationData
 
 scenarios("../../features/projects.feature")
 
@@ -75,7 +76,7 @@ def create_project_with_optional_fields(
     )
 
 
-@given(parsers.parse("User open {project_name} project"))  # user open "DocID" project
+@given(parsers.parse("User open {project_name} project"))
 def open_project(projects_query_page: ProjectsQueryPage, project_name):
     projects_query_page.open_project(project_name)
 
@@ -92,20 +93,36 @@ def user_opens_create_issue_form(issues_tab: IssuesTab):
 
 @when(parsers.parse("enters {issue} fields values and creates issue"))
 def user_enters_issue_fields_values_and_creates_issue(
-    create_issue_form: CreateIssueForm, issue, issue_creation_data
+    create_issue_form: CreateIssueForm, issue, issues_creation_data
 ):
-    create_issue_form.create_issue(issue, issue_creation_data)
+    create_issue_form.create_issue(issues_creation_data[issue])
 
 
 @then(parsers.parse("the {issue} info should display correct fields values"))
-def the_task_info_should_display_correct_fields_values(
-    project_issue_info_page: ProjectIssueInfoPage, issue: str, issue_creation_data
+def the_issue_info_should_display_correct_fields_values(
+    project_issue_info_page: ProjectIssueInfoPage,
+    issue: str,
+    issues_creation_data: IssuesCreationData,
 ):
-    act = project_issue_info_page.get_issue_info()
-    exp = issue_creation_data[issue]
+    act = project_issue_info_page.get_issue_info(list(issues_creation_data[issue]))
+    exp = issues_creation_data[issue]
 
     for key in exp:
-        assert act[key] == exp[key]
+        if key == "StartDate":
+            exp_date = datetime.strptime(exp[key], "%d-%m-%Y")
+            act_date = datetime.strptime(act[key], "%m/%d/%Y")
+            pytest_check.equal(
+                act_date,
+                exp_date,
+                "|Actual: "
+                + act_date.strftime("%m/%d/%Y")
+                + "|Expected: "
+                + exp_date.strftime("%m/%d/%Y"),
+            )
+        else:
+            pytest_check.is_in(
+                exp[key], act[key], "|Actual: " + act[key] + "|Expected: " + exp[key]
+            )
 
 
 # **2. Multi-Level conftest.py (For Organized Projects)**

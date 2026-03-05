@@ -25,16 +25,6 @@ Scenario Outline: Verify creation of projects with optional fields
     |Vendors     |
     |Accounts    |
 
-# Scenario: Verify creation of Vendors project with optional fields
-#     When clicks on New Project link to create the project
-#     And User creates the Vendors project with optional fields
-#     Then Project should be created successfully
-
-# Scenario: Verify creation of Accounts project with optional fields
-#     When clicks on New Project link to create the project
-#     And User creates the Accounts project with optional fields
-#     Then Project should be created successfully
-
 Scenario Outline: Verify that user can create issues within a project
     Given user open "DocID" project
     And navigates to issues tab

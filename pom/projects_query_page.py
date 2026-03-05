@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 from utilities.webdriver_utilities import WebDriverUtilities
 
@@ -19,5 +20,7 @@ class ProjectsQueryPage:
             case "DocID":
                 self.cmd.click(self.docid_proj_link)
             case _:
-                pass
-                # Reporter.log("Project Name is invalid: " + projName);
+                allure.attach(
+                    "Invalid Project Name: " + proj_name,
+                    attachment_type=allure.attachment_type.TEXT,
+                )
