@@ -1,6 +1,11 @@
 import pytest
 
 from pom.projects_query_page import ProjectsQueryPage
+from tests.projects.types import (
+    IssuesCreationData,
+    ProjectsCreationData,
+    SpentTimesCreationData,
+)
 
 
 @pytest.fixture
@@ -9,7 +14,7 @@ def projects_query_page(cd):
 
 
 @pytest.fixture
-def project_creation_data():
+def projects_creation_data() -> ProjectsCreationData:
     return {
         "Vendors": {
             "ProjectName": "Vendors",
@@ -28,7 +33,7 @@ def project_creation_data():
 
 
 @pytest.fixture
-def issue_creation_data():
+def issues_creation_data() -> IssuesCreationData:
     return {
         "Ability to insert DocID in the footer of last page": {
             "Tracker": "Story",
@@ -49,7 +54,7 @@ def issue_creation_data():
 
 
 @pytest.fixture
-def spent_time_creation_data():
+def spent_times_creation_data() -> SpentTimesCreationData:
     return {
         "11:00": {
             "Issue": "Support Edit Time field for DocID",

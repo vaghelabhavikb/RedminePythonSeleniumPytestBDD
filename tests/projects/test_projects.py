@@ -1,4 +1,3 @@
-from ast import Assert
 from math import exp
 import pytest
 import pytest_check
@@ -7,14 +6,12 @@ from tests.common_steps import *
 from pytest_bdd import scenarios, given, step, when, then, parsers
 from pom.create_issue_form import CreateIssueForm
 from pom.issues_tab import IssuesTab
-from pom.login_page import LoginPage
-from pom.landing_page import LandingPage
 from pom.create_project_form import CreateProjectForm
 from pom.project_issue_info_page import ProjectIssueInfoPage
 from pom.project_page import ProjectPage
 from pom.projects_query_page import ProjectsQueryPage
 
-from tests.types import LoginCredentials
+from tests.projects.types import ProjectsCreationData
 
 scenarios("../../features/projects.feature")
 
@@ -35,7 +32,7 @@ def create_issue_form(cd):
 
 
 @pytest.fixture
-def create_project_form_page(cd):
+def create_project_form(cd):
     return CreateProjectForm(cd)
 
 
@@ -54,17 +51,27 @@ def user_enters_project_name(create_project_form_page: CreateProjectForm, projec
     create_project_form_page.create_project(project_name)
 
 
-@then("Project should be created successfully")
-def check_project_created_succesfully(create_project_form_page: CreateProjectForm):
-    pytest_check.is_true(create_project_form_page.check_project_creation_success())
+@then(parsers.parse("{project_name} should be created successfully"))
+def check_project_created_succesfully(
+    project_name, create_project_form: CreateProjectForm
+):
+    pytest_check.is_true(create_project_form.check_project_creation_success())
+    act = create_project_form.get_created_proj_name()
+    pytest_check.equal(
+        project_name,
+        act,
+        "Project Name comparison. |Exp: " + project_name + "| Act: " + act + "|",
+    )
 
 
 @when(parsers.parse("User creates the {project_name} project with optional fields"))
 def create_project_with_optional_fields(
-    create_project_form_page: CreateProjectForm, project_name, project_creation_data
+    create_project_form: CreateProjectForm,
+    project_name,
+    projects_creation_data: ProjectsCreationData,
 ):
-    create_project_form_page.create_project_with_optional_fields(
-        project_name, project_creation_data
+    create_project_form.create_project_with_optional_fields(
+        projects_creation_data[project_name]
     )
 
 

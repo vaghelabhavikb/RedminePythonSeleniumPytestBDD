@@ -25,6 +25,11 @@ class WebDriverUtilities:
     def nav_to_url(self, url):
         self.driver.get(url)
 
+    def get_text(self, by: By) -> str:
+        return self.wait.until(
+            expected_conditions.visibility_of_element_located(by)
+        ).text
+
     def click(self, by):
         self.wait.until(expected_conditions.element_to_be_clickable(by)).click()
 

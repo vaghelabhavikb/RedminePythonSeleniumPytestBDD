@@ -8,7 +8,7 @@ And User navigate to projects module
 Scenario Outline: User creates project with name only field
     When clicks on New Project link to create the project
     And User enters <project name> and creates the project
-    Then Project should be created successfully
+    Then <project name> should be created successfully
 
     Examples:
     |project name|
@@ -18,7 +18,7 @@ Scenario Outline: User creates project with name only field
 Scenario Outline: Verify creation of projects with optional fields
     When clicks on New Project link to create the project
     And User creates the <project name> project with optional fields
-    Then Project should be created successfully
+    Then <project name> should be created successfully
 
     Examples:
     |project name|
