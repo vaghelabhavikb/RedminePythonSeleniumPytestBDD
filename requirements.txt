@@ -1,0 +1,6 @@
+selenium==4.41.0
+pytest
+pytest-bdd
+allure-pytest
+pytest-check
+pytest-xdist
