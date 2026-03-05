@@ -2,6 +2,8 @@ from datetime import datetime
 from math import exp
 import pytest
 import pytest_check
+from pom.create_spent_time_form import CreateSpentTimeForm
+from pom.spent_time_tab import SpentTimeTab
 from tests.projects.common_steps import *
 from tests.common_steps import *
 from pytest_bdd import scenarios, given, step, when, then, parsers
@@ -12,7 +14,11 @@ from pom.project_issue_info_page import ProjectIssueInfoPage
 from pom.project_page import ProjectPage
 from pom.projects_query_page import ProjectsQueryPage
 
-from tests.projects.types import IssuesCreationData, ProjectsCreationData
+from tests.projects.types import (
+    IssuesCreationData,
+    ProjectsCreationData,
+    SpentTimesCreationData,
+)
 
 scenarios("../../features/projects.feature")
 
@@ -28,8 +34,18 @@ def issues_tab(cd):
 
 
 @pytest.fixture
+def spent_time_tab(cd):
+    return SpentTimeTab(cd)
+
+
+@pytest.fixture
 def create_issue_form(cd):
     return CreateIssueForm(cd)
+
+
+@pytest.fixture
+def create_spent_time_form(cd):
+    return CreateSpentTimeForm(cd)
 
 
 @pytest.fixture
@@ -48,8 +64,8 @@ def launch_new_project_form(projects_query_page: ProjectsQueryPage):
 
 
 @when(parsers.parse("User enters {project_name} and creates the project"))
-def user_enters_project_name(create_project_form_page: CreateProjectForm, project_name):
-    create_project_form_page.create_project(project_name)
+def user_enters_project_name(create_project_form: CreateProjectForm, project_name):
+    create_project_form.create_project(project_name)
 
 
 @then(parsers.parse("{project_name} should be created successfully"))
@@ -125,14 +141,47 @@ def the_issue_info_should_display_correct_fields_values(
             )
 
 
-# **2. Multi-Level conftest.py (For Organized Projects)**
+@given("navigates to spent time tab")
+def navigate_to_spent_time_tab(project_page: ProjectPage):
+    project_page.nav_to_spent_time_tab()
 
-# Create `conftest.py` at different directory levels:
-# ```
-# project/
-# ├── conftest.py  # Global fixtures
-# ├── features/
-# │   ├── conftest.py  # Feature-specific fixtures
-# │   ├── login/
-# │   │   ├── conftest.py
-# │   │   └── login_steps.py
+
+@when("user opens create spent time form")
+def user_opens_create_spent_time_form(spent_time_tab: SpentTimeTab):
+    spent_time_tab.launch_spent_time_creation_form()
+
+
+@when(parsers.parse("enters {time_entry} fields values and creates spent time entry"))
+def user_enters_spent_time_fields_values_and_creates_entry(
+    create_spent_time_form: CreateSpentTimeForm,
+    time_entry,
+    spent_times_creation_data: SpentTimesCreationData,
+):
+    create_spent_time_form.post_spent_time(spent_times_creation_data[time_entry])
+
+
+@then(parsers.parse("the {time_entry} entry should display correct fields values"))
+def the_spent_time_entry_should_display_correct_fields_values(
+    spent_time_tab: SpentTimeTab,
+    time_entry,
+    spent_times_creation_data: SpentTimesCreationData,
+):
+    act = spent_time_tab.get_time_entry(time_entry)
+    exp = spent_times_creation_data[time_entry]
+
+    for key in exp:
+        if key == "Date":
+            exp_date = datetime.strptime(exp[key], "%d-%m-%Y")
+            act_date = datetime.strptime(act[key], "%m/%d/%Y")
+            pytest_check.equal(
+                act_date,
+                exp_date,
+                "|Actual: "
+                + act_date.strftime("%m/%d/%Y")
+                + "|Expected: "
+                + exp_date.strftime("%m/%d/%Y"),
+            )
+        else:
+            pytest_check.is_in(
+                exp[key], act[key], "|Actual: " + act[key] + "|Expected: " + exp[key]
+            )

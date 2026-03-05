@@ -100,3 +100,16 @@ class WebDriverUtilities:
 
     def send_tab_key(self):
         ActionChains(self.driver).key_down(Keys.TAB).key_up(Keys.TAB).perform()
+
+    def get_table_data_map(self, by):
+        table = self.wait.until(expected_conditions.presence_of_element_located(by))
+        return [
+            {
+                th.text: td.text
+                for th, td in zip(
+                    table.find_elements(By.TAG_NAME, "th"),
+                    row.find_elements(By.TAG_NAME, "td"),
+                )
+            }
+            for row in table.find_elements(By.TAG_NAME, "tr")[1:]
+        ]

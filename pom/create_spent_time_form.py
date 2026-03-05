@@ -1,30 +1,34 @@
-
+from tests.projects.types import SpentTimeCreationData
 from utilities.webdriver_utilities import WebDriverUtilities
 from selenium.webdriver.common.by import By
 
+
 class CreateSpentTimeForm:
-	issueSelector = (By.ID,"time_entry_issue_id")
-	supportEditTimeIssue = (By.XPATH,"//div[contains(text(),'Support Edit Time field for DocID')]")
-	userSelect = (By.ID,"time_entry_user_id")
-	hoursTB = (By.ID,"time_entry_hours")
-	datePicker = (By.ID,"time_entry_spent_on")
-	commentTB = (By.ID,"time_entry_comments")
-	activityDD = (By.ID,"time_entry_activity_id")
+    issue_selector_sb = (By.ID, "time_entry_issue_id")
+    support_edit_time_issue_item = (
+        By.XPATH,
+        "//div[contains(text(),'Support Edit Time field for DocID')]",
+    )
+    user_select_dd = (By.ID, "time_entry_user_id")
+    hours_tb = (By.ID, "time_entry_hours")
+    date_picker = (By.ID, "time_entry_spent_on")
+    comment_tb = (By.ID, "time_entry_comments")
+    activity_dd = (By.ID, "time_entry_activity_id")
 
-	createBtn = (By.NAME,"commit")
+    create_btn = (By.NAME, "commit")
 
-	def __init__(self, d):
-		self.driver = d
-		self.cmd = WebDriverUtilities(self.driver)
+    def __init__(self, d):
+        self.driver = d
+        self.cmd = WebDriverUtilities(self.driver)
 
-	def postSpentTime(self, data):
-		self.cmd.send_text(self.issueSelector, data.get("Issue"))
-		self.cmd.click(self.supportEditTimeIssue)
-		self.cmd.select_by_visible_text(self.userSelect, data.get("User"))
-		self.cmd.send_text(self.datePicker, data.get("Date"))
-		self.cmd.send_text(self.hoursTB, data.get("Hours"))
-		if (data.containsKey("Comment")):
-			self.cmd.send_text(self.commentTB, data.get("Comment"))
-		self.cmd.select_by_visible_text(self.activityDD, data.get("Activity"))
+    def post_spent_time(self, data: SpentTimeCreationData):
+        self.cmd.send_text(self.issue_selector_sb, data["Issue"])
+        self.cmd.click(self.support_edit_time_issue_item)
+        self.cmd.select_by_visible_text(self.user_select_dd, data["User"])
+        self.cmd.send_text(self.date_picker, data["Date"])
+        self.cmd.send_text(self.hours_tb, data["Hours"])
+        if "Comment" in data:
+            self.cmd.send_text(self.comment_tb, data["Comment"])
+        self.cmd.select_by_visible_text(self.activity_dd, data["Activity"])
 
-		self.cmd.click(self.createBtn)
+        self.cmd.click(self.create_btn)
